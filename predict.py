@@ -4,16 +4,15 @@ import time
 
 os.environ["HF_HUB_OFFLINE"] = "1"
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
-# Aponta cache do HF/terratorch pra pasta com pesos pré-baixados
-os.environ["HF_HOME"] = "/src/weights"
+# Aponta cache HF pra pasta pré-populada na build (estrutura HF cache real)
+os.environ["HF_HUB_CACHE"] = "/src/hf-cache"
 
 import numpy as np
 import torch
 from cog import BasePredictor, Input, Path
 from PIL import Image
 
-WEIGHTS_DIR = "/src/weights/terramind-base"
-CHECKPOINT_PATH = f"{WEIGHTS_DIR}/TerraMind_v1_base.pt"
+WEIGHTS_DIR = "/src/hf-cache"
 
 
 class Predictor(BasePredictor):
