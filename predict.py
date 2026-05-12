@@ -26,21 +26,24 @@ class Predictor(BasePredictor):
         print(f"[setup] cuda: {torch.cuda.is_available()}", flush=True)
 
         print(f"[setup] importing terratorch... (t={time.time()-t0:.1f}s)", flush=True)
-        from terratorch import BACKBONE_REGISTRY
+        try:
+            from terratorch import BACKBONE_REGISTRY
+        except Exception as e:
+            print(f"[setup] ERROR importing terratorch: {type(e).__name__}: {e}", flush=True)
+            raise
         self.BACKBONE_REGISTRY = BACKBONE_REGISTRY
-
-        # Aponta cache local pro terratorch encontrar o checkpoint
-        # O terratorch espera o arquivo TerraMind_v1_base.pt em algum diretório acessível.
-        # Vamos usar TORCH_HOME ou similar.
-        os.environ["TERRAMIND_CHECKPOINT_PATH"] = CHECKPOINT_PATH
+        print(f"[setup] terratorch imported OK (t={time.time()-t0:.1f}s)", flush=True)
 
         print(f"[setup] building terramind_v1_base backbone (RGB)... (t={time.time()-t0:.1f}s)", flush=True)
-        # Carrega backbone com modalidade RGB (mais acessível pro user comum)
-        self.model = BACKBONE_REGISTRY.build(
-            "terramind_v1_base",
-            pretrained=True,
-            modalities=["RGB"],
-        )
+        try:
+            self.model = BACKBONE_REGISTRY.build(
+                "terramind_v1_base",
+                pretrained=True,
+                modalities=["RGB"],
+            )
+        except Exception as e:
+            print(f"[setup] ERROR building model: {type(e).__name__}: {e}", flush=True)
+            raise
         self.model = self.model.eval()
         if torch.cuda.is_available():
             self.model = self.model.cuda().to(torch.float32)
